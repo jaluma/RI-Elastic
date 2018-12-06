@@ -34,17 +34,20 @@ def menu():
     print(" 5 - Salir")
     print("Escoja un ejercicio (1-5):")
 
+
 def ejercicio1():
     pp = pprint.PrettyPrinter(indent=2)
 
     es = Elasticsearch()
 
-    #query = raw_input("\tIntroduzca los terminos a buscar >>")
-    query = "alcohol"
-
+    query = raw_input("\tIntroduzca los terminos a buscar separados por espacios >>")
     query.replace(' ', " OR ")
-    #est = input("\tIntroduzca estadistico (JSON) >>")
-    est = "'gnd': {}"
+
+
+    properties = selectEstadistico()
+    est = properties[0]
+    properties_est = properties[1]
+
     number=5
 
     results = es.search(index="reddit-mentalhealth",
@@ -60,19 +63,22 @@ def ejercicio1():
             "Title": {
               "significant_terms": {
                 "field": "title",
-                "size":number,
+                "size": number,
+                 est: properties_est
               }
             },
             "Text": {
               "significant_terms": {
                 "field": "selftext",
                 "size": number,
+                 est: properties_est
               }
             },
             "Subreddit": {
               "significant_terms": {
                 "field": "subreddit",
                 "size": number,
+                 est: properties_est
               }
             }
           }
@@ -86,8 +92,6 @@ def ejercicio1():
 
     results = es.search(index="reddit-mentalhealth",
         body = {
-            "from": 0,
-            "size": 100,
             "query": {
                 "query_string": {
                     "query": ' or '.join(words),
@@ -95,6 +99,39 @@ def ejercicio1():
             }
         })
 
+    serializer(results['hits']['hits'], 'Ejercicio1.json')
 
+def selectEstadistico():
+    ests = ['gnd', 'mutual_information', 'jlh', 'chi_square', 'porcentage']
+    while True:
+        print("---Escoja estadistico---")
+        print(" 1 -", ests[0])
+        print(" 2 -", ests[1])
+        print(" 3 -", ests[2])
+        print(" 4 -", ests[3])
+        print(" 5 -", ests[4])
+
+        est = ests[raw_input("Escoja un estadistico (1-5): >> ")-1]
+
+        switcher = {
+            "gnd": {},
+            "mutual_information": {'include_negatives':'true'},
+            "jlh": {},
+            "chi_square": {},
+            "percentage": {},
+        }
+
+        if (switcher.get(est, "error") != "error"):
+            return est, switcher.get(est, "error") 
+
+
+def serializer(results, filename):
+    with open(filename, 'w') as outfile:
+        json.dump(results, outfile, sort_keys=True, indent=3)
+    print("Cargado correctamente los resultados.")
+
+
+
+# script
 if __name__ == '__main__':
     main()
