@@ -166,7 +166,50 @@ def serializer(results, filename):
 
 def ejercicio3():
     lista_medicamentos_wikidata = wikidataquery.get_medicamentos()
-    print(lista_medicamentos_wikidata)
+
+    #guardar los medicamentos
+    #serializer(lista_medicamentos_wikidata, 'Medicamentos.json')
+    
+    es = config()
+
+    properties = selectEstadistico()
+    est = properties[0]
+    properties_est = properties[1]
+
+    number = 25
+
+    results = es.search(index="reddit-mentalhealth",
+    body = {
+        "size": 0,
+        "query": {
+            "query_string": {
+                "query": "(prescribed OR taking OR using) AND (*zepam OR *clone)",
+                "allow_leading_wildcard": true
+            }
+        }, 
+          "aggs": {
+            "Title": {
+              "significant_terms": {
+                "field": "title",
+                "size": number,
+                 est: properties_est
+              }
+            },
+            "Text": {
+              "significant_terms": {
+                "field": "selftext",
+                "size": number,
+                 est: properties_est
+              }
+            }
+          }
+    })
+
+    words = []
+    for j in ["Text", "Title"]:
+        for i in results["aggregations"][j]["buckets"]:
+            if (i["key"] not in words):
+                words.append(i["key"])
 
 # script
 if __name__ == '__main__':

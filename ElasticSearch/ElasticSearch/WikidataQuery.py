@@ -18,9 +18,16 @@ def get_results(endpoint_url, query):
 def get_medicamentos():
     endpoint_url = "https://query.wikidata.org/sparql"
 
-    query = """SELECT ?medicamentoLabel WHERE {
-      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-      OPTIONAL { ?item wdt:P2176 ?medicamento. }
-    }"""
+    query = """SELECT ?medicationLabel WHERE {
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+    ?medication wdt:P31 wd:Q12140.
+    }
+    LIMIT 100000"""
 
-    return get_results(endpoint_url, query)
+    json = get_results(endpoint_url, query)
+
+    meds = []
+    for e in json:
+        for value in e.values():
+            meds.append(value['value'])
+    return meds
