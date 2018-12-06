@@ -11,8 +11,8 @@ def main():
     while True:
         menu()
 
-        opcionMenu = raw_input("inserta un numero valor >> ")
-        print("")
+        opcionMenu = raw_input("Inserta un numero >> ")
+        print()
         if opcionMenu == "1":   
             ejercicio1()
         elif opcionMenu == "2":
@@ -27,11 +27,11 @@ def main():
             input("Opcion incorrecta")
 
 def menu():
-    print("---ElasticSearch---")
-    print(" 1 - Ejercicio1")
-    print(" 2 - Ejercicio2")
-    print(" 3 - Ejercicio3")
-    print(" 4 - Ejercicio4")
+    print("--- ElasticSearch ---")
+    print(" 1 - Ejercicio 1")
+    print(" 2 - Ejercicio 2")
+    print(" 3 - Ejercicio 3")
+    print(" 4 - Ejercicio 4")
     print(" 5 - Salir")
     print("Escoja un ejercicio (1-5):")
 
@@ -74,7 +74,7 @@ def ejercicio1():
     es = config()
 
     query = raw_input("Introduzca los terminos a buscar separados por espacios >> ")
-    print("")
+    print()
     query.replace(' ', " OR ")
 
 
@@ -135,35 +135,6 @@ def ejercicio1():
 
     serializer(results['hits']['hits'], 'Ejercicio1.json')
 
-def selectEstadistico():
-    ests = ['gnd', 'mutual_information', 'jlh', 'chi_square', 'porcentage']
-    while True:
-        print("---Escoja estadistico---")
-        print(" 1 -", ests[0])
-        print(" 2 -", ests[1])
-        print(" 3 -", ests[2])
-        print(" 4 -", ests[3])
-        print(" 5 -", ests[4])
-
-        est = ests[input("Escoja un estadistico (1-5): >> ") - 1]
-
-        switcher = {
-            "gnd": {},
-            "mutual_information": {'include_negatives':'true'},
-            "jlh": {},
-            "chi_square": {},
-            "percentage": {},
-        }
-
-        if (switcher.get(est, "error") != "error"):
-            return est, switcher.get(est, "error") 
-
-
-def serializer(results, filename):
-    with open(filename, 'w') as outfile:
-        json.dump(results, outfile, sort_keys=True, indent=3)
-    print("Cargado correctamente los resultados.\n")
-
 def ejercicio3():
     lista_medicamentos_wikidata = wikidataquery.get_medicamentos()
 
@@ -184,7 +155,7 @@ def ejercicio3():
         "query": {
             "query_string": {
                 "query": "(prescribed OR taking OR using) AND (*zepam OR *clone)",
-                "allow_leading_wildcard": true
+                "allow_leading_wildcard": "true"
             }
         }, 
           "aggs": {
@@ -205,11 +176,46 @@ def ejercicio3():
           }
     })
 
-    words = []
+    meds = []
     for j in ["Text", "Title"]:
         for i in results["aggregations"][j]["buckets"]:
-            if (i["key"] not in words):
-                words.append(i["key"])
+            if (i["key"] not in meds and i["key"] in lista_medicamentos_wikidata):
+                meds.append(i["key"])
+
+    print("--- Medicamentos ---")
+    for med in meds:
+        print("\t",med)
+    print()
+
+def selectEstadistico():
+    ests = ['gnd', 'mutual_information', 'jlh', 'chi_square', 'porcentage']
+    while True:
+        print("---Escoja estadistico---")
+        print(" 1 -", ests[0])
+        print(" 2 -", ests[1])
+        print(" 3 -", ests[2])
+        print(" 4 -", ests[3])
+        print(" 5 -", ests[4])
+
+        est = ests[input("Escoja un estadistico (1-5): >> ") - 1]
+        print()
+
+        switcher = {
+            "gnd": {},
+            "mutual_information": {'include_negatives':'true'},
+            "jlh": {},
+            "chi_square": {},
+            "percentage": {},
+        }
+
+        if (switcher.get(est, "error") != "error"):
+            return est, switcher.get(est, "error") 
+
+
+def serializer(results, filename):
+    with open(filename, 'w') as outfile:
+        json.dump(results, outfile, sort_keys=True, indent=3)
+    print("Cargado correctamente los resultados.\n")
 
 # script
 if __name__ == '__main__':
