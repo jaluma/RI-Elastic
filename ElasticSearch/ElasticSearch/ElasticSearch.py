@@ -6,6 +6,7 @@ import wikidataquery
 import json
 import pprint
 import sys
+import codecs
 
 def main():
     while True:
@@ -187,6 +188,61 @@ def ejercicio3():
         print("\t",med)
     print()
 
+def ejercicio4():
+    data, query = selectProblematica()
+
+    es = config()
+
+    properties = selectEstadistico()
+    est = properties[0]
+    properties_est = properties[1]
+
+    number = 5
+
+    results = es.search(index="reddit-mentalhealth",
+    body = {
+        "size": 0,
+        "query": {
+            "query_string": {
+                "default_field": "selftext",
+                "query": query,
+            }
+        }, 
+          "aggs": {
+            "Title": {
+              "significant_terms": {
+                "field": "title",
+                "size": number,
+                 est: properties_est
+              }
+            },
+            "Text": {
+              "significant_terms": {
+                "field": "selftext",
+                "size": number,
+                 est: properties_est
+              }
+            },
+            "Subreddit": {
+              "significant_terms": {
+                "field": "subreddit",
+                "size": number,
+                 est: properties_est
+              }
+            }
+          }
+    })
+
+    words = []
+    for j in ["Subreddit", "Text", "Title"]:
+        [words.append(i["key"]) for i in results["aggregations"][j]["buckets"] if i["key"] not in words and any(i["key"] in s for s in data)]
+
+    print("--- Expresiones usadas para el suicidio ---")
+    for word in words:
+        print("\t",word)
+    print()
+
+
 def selectEstadistico():
     ests = ['gnd', 'mutual_information', 'jlh', 'chi_square', 'porcentage']
     while True:
@@ -211,11 +267,39 @@ def selectEstadistico():
         if (switcher.get(est, "error") != "error"):
             return est, switcher.get(est, "error") 
 
-
 def serializer(results, filename):
     with open(filename, 'w') as outfile:
         json.dump(results, outfile, sort_keys=True, indent=3)
     print("Cargado correctamente los resultados.\n")
+
+def selectProblematica():
+    print(" 1 - Problematica del suicidio")
+    print(" 2 - Problematica de las autolesiones")
+    select = input("Escoja un ejercicio (1-2) >> ")
+    print()
+
+    if (select == 1):
+        data = loadTitlesGoogleScholar('scholar-suicidio.json')
+        query = "suicide"
+    elif (select == 2):
+        data = loadTitlesGoogleScholar('scholar-self-harm.json')
+        query = "self-harm"
+
+    return data, query
+
+
+def loadTitlesGoogleScholar(filename):
+    with open(filename, 'r') as json_data:
+        bom_maybe = json_data.read(3)
+        if bom_maybe != codecs.BOM_UTF8:
+            json_data.seek(0)
+        data = json.load(json_data)
+
+    titles=[]
+    for e in data:
+        titles.append(e['title'])
+    return titles
+
 
 # script
 if __name__ == '__main__':
