@@ -4,13 +4,13 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>16903b3d-4c6c-4ae9-9efc-6e629404165c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>ElasticSearch.py</StartupFile>
+    <StartupFile>elasticsearch.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>ElasticSearch</Name>
-    <RootNamespace>ElasticSearch</RootNamespace>
+    <Name>elasticsearch</Name>
+    <RootNamespace>elasticsearch</RootNamespace>
     <InterpreterId>Global|PythonCore|2.7</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -22,7 +22,8 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ElasticSearch.py" />
+    <Compile Include="elasticsearch.py" />
+    <Compile Include="wikidataquery.py"/>
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|2.7" />

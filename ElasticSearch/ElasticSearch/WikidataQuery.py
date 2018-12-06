@@ -3,6 +3,10 @@ import sys
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 
+
+def install_and_import(package):
+    subprocess.call([sys.executable, "-m", "pip", "install", package], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
 def get_results(endpoint_url, query):
     install_and_import('sparqlwrapper')
 
@@ -10,9 +14,6 @@ def get_results(endpoint_url, query):
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
     return sparql.query().convert()["results"]["bindings"]
-
-def install_and_import(package):
-    subprocess.call([sys.executable, "-m", "pip", "install", package], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 def get_medicamentos():
     endpoint_url = "https://query.wikidata.org/sparql"
@@ -23,6 +24,3 @@ def get_medicamentos():
     }"""
 
     return get_results(endpoint_url, query)
-
-for result in results:
-    print(result)

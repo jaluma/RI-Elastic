@@ -1,10 +1,11 @@
 from __future__ import print_function
+from elasticsearch5 import Elasticsearch
+
+import wikidataquery
 
 import json
 import pprint
 import sys
-from elasticsearch import Elasticsearch
-
 
 def main():
     while True:
@@ -45,30 +46,32 @@ def config():
         "author": {
             "type": "text",
             "term_vector": "yes",
-            "fielddata": true
+            "fielddata": "true"
         },
         "selftext": {
             "type":"text",
             "term_vector": "yes",
-            "fielddata": true
+            "fielddata": "true"
         },
         "title": {
             "type":"text",
             "term_vector": "yes",
-            "fielddata": true
+            "fielddata": "true"
         },
         "subreddit": {
             "type":"text",
             "term_vector": "yes",
-            "fielddata": true
+            "fielddata": "true"
         }
       }
     }
 
     es.indices.put_mapping(index="reddit-mentalhealth",doc_type="put",body=argumentos,ignore=400)
 
+    return es
+
 def ejercicio1():
-    config()
+    es = config()
 
     query = raw_input("Introduzca los terminos a buscar separados por espacios >> ")
     print("")
@@ -125,7 +128,7 @@ def ejercicio1():
         body = {
             "query": {
                 "query_string": {
-                    "query": ' or '.join(words),
+                    "query": ' OR '.join(words),
                 }
             }
         })
@@ -159,9 +162,11 @@ def selectEstadistico():
 def serializer(results, filename):
     with open(filename, 'w') as outfile:
         json.dump(results, outfile, sort_keys=True, indent=3)
-    print("Cargado correctamente los resultados.")
+    print("Cargado correctamente los resultados.\n")
 
-
+def ejercicio3():
+    lista_medicamentos_wikidata = wikidataquery.get_medicamentos()
+    print(lista_medicamentos_wikidata)
 
 # script
 if __name__ == '__main__':
