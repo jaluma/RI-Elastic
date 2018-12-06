@@ -14,12 +14,12 @@ def main():
         print("")
         if opcionMenu == "1":   
             ejercicio1()
-        elif opcionMenu=="2":
-            ejercicio2();
+        elif opcionMenu == "2":
+            ejercicio2()
         elif opcionMenu == "3":
-            ejercicio3();
+            ejercicio3()
         elif opcionMenu == "4":
-            ejercicio4();
+            ejercicio4()
         elif opcionMenu == "5":
             exit()
         else:
@@ -34,13 +34,44 @@ def menu():
     print(" 5 - Salir")
     print("Escoja un ejercicio (1-5):")
 
-
-def ejercicio1():
+def config():
     pp = pprint.PrettyPrinter(indent=2)
 
     es = Elasticsearch()
 
-    query = raw_input("\tIntroduzca los terminos a buscar separados por espacios >>")
+    #configuracion usada en el indice
+    argumentos = {
+      "properties": {
+        "author": {
+            "type": "text",
+            "term_vector": "yes",
+            "fielddata": true
+        },
+        "selftext": {
+            "type":"text",
+            "term_vector": "yes",
+            "fielddata": true
+        },
+        "title": {
+            "type":"text",
+            "term_vector": "yes",
+            "fielddata": true
+        },
+        "subreddit": {
+            "type":"text",
+            "term_vector": "yes",
+            "fielddata": true
+        }
+      }
+    }
+
+    es.indices.put_mapping(index="reddit-mentalhealth",doc_type="put",body=argumentos,ignore=400)
+
+def ejercicio1():
+    config()
+
+    query = raw_input("Introduzca los terminos a buscar separados por espacios >> ")
+    print("")
     query.replace(' ', " OR ")
 
 
@@ -48,7 +79,7 @@ def ejercicio1():
     est = properties[0]
     properties_est = properties[1]
 
-    number=5
+    number = 5
 
     results = es.search(index="reddit-mentalhealth",
     body = {
@@ -111,7 +142,7 @@ def selectEstadistico():
         print(" 4 -", ests[3])
         print(" 5 -", ests[4])
 
-        est = ests[raw_input("Escoja un estadistico (1-5): >> ")-1]
+        est = ests[input("Escoja un estadistico (1-5): >> ") - 1]
 
         switcher = {
             "gnd": {},
