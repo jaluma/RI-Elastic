@@ -123,6 +123,7 @@ def ejercicio1():
 
     stops_words = []
 
+    #quitar palabras vacias
     with open("stop.txt") as f:
         for line in f:
             stops_words.append(line.split(" ",1)[0])
@@ -198,14 +199,14 @@ def ejercicio3():
     est = properties[0]
     properties_est = properties[1]
 
-    number = 25
+    number = 1000
 
     results = es.search(index="reddit-mentalhealth",
     body = {
         "size": 0,
         "query": {
             "query_string": {
-                "query": "(prescribed OR taking OR using) AND (*zepam OR *clone)",
+                "query": "using OR prescribed OR dose OR mg -water",
                 "allow_leading_wildcard": "true"
             }
         }, 
