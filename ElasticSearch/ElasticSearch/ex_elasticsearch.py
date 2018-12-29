@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from elasticsearch import Elasticsearch
 
-import subprocess
+import util
 import wikidataquery
 
 import json
@@ -144,7 +144,7 @@ def ejercicio1():
             }
         })
 
-    serializer(results['hits']['hits'], 'Ejercicio1.json')
+    util.serializer(results['hits']['hits'], 'Ejercicio1.json')
 
 def ejercicio2():
     es = config()
@@ -152,7 +152,7 @@ def ejercicio2():
     query = raw_input("Introduzca un termino/frase a buscar >> ")
     print()
 
-    install_and_import("elasticsearch-dsl")
+    util.install_and_import("elasticsearch-dsl", "elasticsearch_dsl")
     from elasticsearch_dsl import Search
     from elasticsearch_dsl.query import MoreLikeThis
 
@@ -163,11 +163,8 @@ def ejercicio2():
 
     s = Search(using=es, index="reddit-mentalhealth") \
     .query(MoreLikeThis(like=query, fields=["selftext","title","subreddit"])) \
-    .aggs.bucket('Title', 'significant_terms', field='title', size=number) \
-    .aggs.bucket('Subreddit', 'significant_terms', field='subreddit', size=number) \
-    .aggs.bucket('Selftext', 'significant_terms', field='selftext', size=number)
 
-    s = s.execute()
+    results = s.execute()
 
     words = []
     for j in ["Subreddit", "Text", "Title"]:
@@ -184,7 +181,7 @@ def ejercicio2():
             }
         })
     
-    serializer(results['hits']['hits'], 'Ejercicio2.json')
+    util.serializer(results['hits']['hits'], 'Ejercicio2.json')
 
 
 def ejercicio3():
@@ -318,11 +315,6 @@ def select_estadistico():
         if (switcher.get(est, "error") != "error"):
             return est, switcher.get(est, "error") 
 
-def serializer(results, filename):
-    with open(filename, 'w') as outfile:
-        json.dump(results, outfile, sort_keys=True, indent=3)
-    print("Cargado correctamente los resultados.\n")
-
 def select_problematica():
     print(" 1 - Problematica del suicidio")
     print(" 2 - Problematica de las autolesiones")
@@ -351,8 +343,7 @@ def load_titles_google_scholar(filename):
         titles.append(e['title'])
     return titles
 
-def install_and_import(package):
-    subprocess.call([sys.executable, "-m", "pip", "install", package], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
 
 # script
 if __name__ == '__main__':
