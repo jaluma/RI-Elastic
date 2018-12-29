@@ -11,7 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>elasticsearch</Name>
     <RootNamespace>elasticsearch</RootNamespace>
-    <InterpreterId>Global|PythonCore|2.7</InterpreterId>
+    <InterpreterId>Global|PythonCore|2.7-32</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,10 +23,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="elasticsearch.py" />
-    <Compile Include="wikidataquery.py"/>
+    <Compile Include="wikidataquery.py" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="Global|PythonCore|2.7" />
+    <InterpreterReference Include="Global|PythonCore|2.7-32" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="mentalhealth-subreddits.json" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

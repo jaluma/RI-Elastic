@@ -83,7 +83,7 @@ def ejercicio1():
     est = properties[0]
     properties_est = properties[1]
 
-    number = 5
+    number = 2
 
     results = es.search(index="reddit-mentalhealth",
     body = {
@@ -151,14 +151,14 @@ def ejercicio3():
     est = properties[0]
     properties_est = properties[1]
 
-    number = 25
+    number = 1000
 
     results = es.search(index="reddit-mentalhealth",
     body = {
         "size": 0,
         "query": {
             "query_string": {
-                "query": "(prescribed OR taking OR using) AND (*zepam OR *clone)",
+                "query": "using OR prescribed OR dose OR mg -water",
                 "allow_leading_wildcard": "true"
             }
         }, 
