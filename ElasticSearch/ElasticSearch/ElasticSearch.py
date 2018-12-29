@@ -1,7 +1,7 @@
 from __future__ import print_function
 from elasticsearch5 import Elasticsearch
 
-import wikidataquery
+from wikidataquery import get_medicamentos
 
 import json
 import pprint
@@ -23,7 +23,7 @@ def main():
         elif opcionMenu == "4":
             ejercicio4()
         elif opcionMenu == "5":
-            exit()
+            return
         else:
             input("Opcion incorrecta")
 
