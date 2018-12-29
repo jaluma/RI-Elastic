@@ -79,7 +79,7 @@ def ejercicio1():
     query.replace(' ', " OR ")
 
 
-    properties = selectEstadistico()
+    properties = select_estadistico()
     est = properties[0]
     properties_est = properties[1]
 
@@ -136,6 +136,9 @@ def ejercicio1():
 
     serializer(results['hits']['hits'], 'Ejercicio1.json')
 
+def ejercicio2():
+    pass
+
 def ejercicio3():
     lista_medicamentos_wikidata = wikidataquery.get_medicamentos()
 
@@ -144,7 +147,7 @@ def ejercicio3():
     
     es = config()
 
-    properties = selectEstadistico()
+    properties = select_estadistico()
     est = properties[0]
     properties_est = properties[1]
 
@@ -189,11 +192,11 @@ def ejercicio3():
     print()
 
 def ejercicio4():
-    data, query = selectProblematica()
+    data, query = select_problematica()
 
     es = config()
 
-    properties = selectEstadistico()
+    properties = select_estadistico()
     est = properties[0]
     properties_est = properties[1]
 
@@ -243,7 +246,7 @@ def ejercicio4():
     print()
 
 
-def selectEstadistico():
+def select_estadistico():
     ests = ['gnd', 'mutual_information', 'jlh', 'chi_square', 'porcentage']
     while True:
         print("---Escoja estadistico---")
@@ -272,23 +275,23 @@ def serializer(results, filename):
         json.dump(results, outfile, sort_keys=True, indent=3)
     print("Cargado correctamente los resultados.\n")
 
-def selectProblematica():
+def select_problematica():
     print(" 1 - Problematica del suicidio")
     print(" 2 - Problematica de las autolesiones")
     select = input("Escoja un ejercicio (1-2) >> ")
     print()
 
     if (select == 1):
-        data = loadTitlesGoogleScholar('scholar-suicidio.json')
+        data = load_titles_google_scholar('scholar-suicidio.json')
         query = "suicide"
     elif (select == 2):
-        data = loadTitlesGoogleScholar('scholar-self-harm.json')
+        data = load_titles_google_scholar('scholar-self-harm.json')
         query = "self-harm"
 
     return data, query
 
 
-def loadTitlesGoogleScholar(filename):
+def load_titles_google_scholar(filename):
     with open(filename, 'r') as json_data:
         bom_maybe = json_data.read(3)
         if bom_maybe != codecs.BOM_UTF8:
