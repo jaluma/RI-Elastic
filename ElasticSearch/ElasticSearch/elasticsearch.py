@@ -1,7 +1,7 @@
 from __future__ import print_function
 from elasticsearch5 import Elasticsearch
 
-from wikidataquery import get_medicamentos
+import wikidataquery
 
 import json
 import pprint
@@ -240,7 +240,7 @@ def ejercicio4():
     for j in ["Subreddit", "Text", "Title"]:
         [words.append(i["key"]) for i in results["aggregations"][j]["buckets"] if i["key"] not in words and any(i["key"] in s for s in data)]
 
-    print("--- Expresiones usadas para el suicidio ---")
+    print("--- Expresiones usadas ---")
     for word in words:
         print("\t",word)
     print()
