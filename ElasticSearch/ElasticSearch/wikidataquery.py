@@ -1,11 +1,12 @@
 import subprocess
 import sys
 
+from SPARQLWrapper import SPARQLWrapper, JSON
+
 
 def install_and_import(package):
     subprocess.call([sys.executable, "-m", "pip", "install", package], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    from SPARQLWrapper import SPARQLWrapper, JSON
-    global SPARQLWrapper, JSON
+    #global SPARQLWrapper, JSON
 
 def get_results(endpoint_url, query):
     install_and_import('sparqlwrapper')

@@ -1,6 +1,8 @@
 from __future__ import print_function
-from elasticsearch5 import Elasticsearch
 
+from elasticsearch import Elasticsearch
+
+import subprocess
 import wikidataquery
 
 import json
@@ -83,7 +85,7 @@ def ejercicio1():
     est = properties[0]
     properties_est = properties[1]
 
-    number = 5
+    number = 1000
 
     results = es.search(index="reddit-mentalhealth",
     body = {
@@ -119,10 +121,17 @@ def ejercicio1():
           }
     })
 
+    stops_words = []
+
+    with open("stop.txt") as f:
+        for line in f:
+            stops_words.append(line.split(" ",1)[0])
+    stops_words = list(filter(lambda x: x!= "\n" and x!= "", stops_words))
+
     words = []
     for j in ["Subreddit", "Text", "Title"]:
         for i in results["aggregations"][j]["buckets"]:
-            if (i["key"] not in words):
+            if (i["key"] not in stops_words and i["key"] not in words):
                 words.append(i["key"])
 
     results = es.search(index="reddit-mentalhealth",
@@ -137,7 +146,45 @@ def ejercicio1():
     serializer(results['hits']['hits'], 'Ejercicio1.json')
 
 def ejercicio2():
-    pass
+    es = config()
+
+    query = raw_input("Introduzca un termino/frase a buscar >> ")
+    print()
+
+    install_and_import("elasticsearch-dsl")
+    from elasticsearch_dsl import Search
+    from elasticsearch_dsl.query import MoreLikeThis
+
+    s = Search()
+    s = s.query()
+
+    number = 1000
+
+    s = Search(using=es, index="reddit-mentalhealth") \
+    .query(MoreLikeThis(like=query, fields=["selftext","title","subreddit"])) \
+    .aggs.bucket('Title', 'significant_terms', field='title', size=number) \
+    .aggs.bucket('Subreddit', 'significant_terms', field='subreddit', size=number) \
+    .aggs.bucket('Selftext', 'significant_terms', field='selftext', size=number)
+
+    s = s.execute()
+
+    words = []
+    for j in ["Subreddit", "Text", "Title"]:
+        for i in results["aggregations"][j]["buckets"]:
+            if (i["key"] not in words):
+                words.append(i["key"])
+
+    results = es.search(index="reddit-mentalhealth",
+        body = {
+            "query": {
+                "query_string": {
+                    "query": ' OR '.join(words),
+                }
+            }
+        })
+    
+    serializer(results['hits']['hits'], 'Ejercicio2.json')
+
 
 def ejercicio3():
     lista_medicamentos_wikidata = wikidataquery.get_medicamentos()
@@ -303,6 +350,8 @@ def load_titles_google_scholar(filename):
         titles.append(e['title'])
     return titles
 
+def install_and_import(package):
+    subprocess.call([sys.executable, "-m", "pip", "install", package], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 # script
 if __name__ == '__main__':

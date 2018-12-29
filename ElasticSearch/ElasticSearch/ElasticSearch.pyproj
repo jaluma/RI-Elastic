@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>16903b3d-4c6c-4ae9-9efc-6e629404165c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>elasticsearch.py</StartupFile>
+    <StartupFile>ex_elasticsearch.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,7 +22,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="elasticsearch.py" />
+    <Compile Include="ex_elasticsearch.py" />
     <Compile Include="wikidataquery.py"/>
   </ItemGroup>
   <ItemGroup>
