@@ -10,7 +10,7 @@ def install_and_import(package, module_name=""):
         module_name = package
 
     try:
-        __import__(package)
+        __import__(module_name)
     except ImportError:
         print("Instalando paquetes necesarios...")
         subprocess.call([sys.executable, "-m", "pip", "install", package], stdout=subprocess.PIPE, stderr=subprocess.PIPE)

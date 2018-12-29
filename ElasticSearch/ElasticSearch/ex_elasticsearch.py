@@ -28,7 +28,7 @@ def main():
         elif opcionMenu == "5":
             return
         else:
-            input("Opcion incorrecta")
+            print("Opcion incorrecta")
 
 def menu():
     print("--- ElasticSearch ---")
@@ -70,7 +70,7 @@ def config():
       }
     }
 
-    es.indices.put_mapping(index="reddit-mentalhealth",doc_type="put",body=argumentos,ignore=400)
+    es.indices.put_mapping(index="reddit-mentalhealth",doc_type="post",body=argumentos,ignore=400)
 
     return es
 
@@ -128,7 +128,7 @@ def ejercicio1():
     with open("stop.txt") as f:
         for line in f:
             stops_words.append(line.split(" ",1)[0])
-    stops_words = list(filter(lambda x: x!= "\n" and x!= "", stops_words))
+    stops_words = list(filter(lambda x: x != "\n" and x != "", stops_words))
 
     words = []
     for j in ["Subreddit", "Text", "Title"]:
@@ -145,7 +145,7 @@ def ejercicio1():
             }
         })
 
-    json_data=[]
+    json_data = []
     for element in results['hits']['hits']:
         data = {}
         element = element['_source']
@@ -155,7 +155,10 @@ def ejercicio1():
         json_data.append(data)
 
 
-    util.serializer(json_data, 'Ejercicio1.json')
+    if len(json_data) != 0:
+        util.serializer(json_data, 'Ejercicio1.json')
+    else:
+        print("No hay datos para guardar.\n")
 
 def ejercicio2():
     es = config()
@@ -167,30 +170,84 @@ def ejercicio2():
     from elasticsearch_dsl import Search
     from elasticsearch_dsl.query import MoreLikeThis
 
-    number = 1000
+    properties = select_estadistico()
+    est = properties[0]
+    properties_est = properties[1]
+
+    number = 25
 
     s = Search(using=es, index="reddit-mentalhealth")
-    s = s.query(MoreLikeThis(like={query}, fields=["selftext","title","subreddit"])) \
-
-    results = s.execute().to_dict()['hits']
-    print(results)
-
-    #words = []
-    #for j in ["Subreddit", "Text", "Title"]:
-    #    for i in results["aggregations"][j]["buckets"]:
-    #        if (i["key"] not in words):
-    #            words.append(i["key"])
-
-    #results = es.search(index="reddit-mentalhealth",
-    #    body = {
-    #        "query": {
-    #            "query_string": {
-    #                "query": ' OR '.join(words),
-    #            }
-    #        }
-    #    })
+    s = s.query(MoreLikeThis(like=query, fields=['selftext','title','subreddit'], min_term_freq=1, max_query_terms=number,))
     
-    util.serializer(results, 'Ejercicio2.json')
+    agg = {
+            "significant_terms": {
+                "field": "selftext",
+                "size": number,
+                est: properties_est
+             }
+          }
+
+    s.aggs.bucket('Text', agg)
+
+    agg = {
+            "significant_terms": {
+                "field": "subreddit",
+                "size": number,
+                est: properties_est
+             }
+          }
+
+    s.aggs.bucket('Subreddit', agg)
+
+    agg = {
+            "significant_terms": {
+                "field": "title",
+                "size": number,
+                est: properties_est
+             }
+          }
+
+    s.aggs.bucket('Title', agg)
+
+    results = s.execute().to_dict()
+
+    stops_words = []
+
+    #quitar palabras vacias
+    with open("stop.txt") as f:
+        for line in f:
+            stops_words.append(line.split(" ",1)[0])
+    stops_words = list(filter(lambda x: x != "\n" and x != "", stops_words))
+
+    words = []
+    for j in ["Subreddit", "Text", "Title"]:
+        for i in results["aggregations"][j]["buckets"]:
+            if (i["key"] not in stops_words and i["key"] not in words):
+                words.append(i["key"])
+
+    results = es.search(index="reddit-mentalhealth",
+        body = {
+            "query": {
+                "query_string": {
+                    "query": ' OR '.join(words),
+                }
+            }
+        })
+
+    json_data = []
+    for element in results['hits']['hits']:
+        data = {}
+        element = element['_source']
+        data['selftext'] = element['selftext']
+        data['title'] = element['title']
+        data['subreddit'] = element['subreddit']
+        json_data.append(data)
+
+
+    if len(json_data) != 0:
+        util.serializer(json_data, 'Ejercicio2.json')
+    else:
+        print("No hay datos para guardar.\n")
 
 
 def ejercicio3():
@@ -347,7 +404,7 @@ def load_titles_google_scholar(filename):
             json_data.seek(0)
         data = json.load(json_data)
 
-    titles=[]
+    titles = []
     for e in data:
         titles.append(e['title'])
     return titles

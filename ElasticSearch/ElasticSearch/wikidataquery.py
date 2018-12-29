@@ -26,10 +26,3 @@ def get_medicamentos():
         for value in e.values():
             meds.append(value['value'])
     return meds
-
-def main():
-    install_and_import('sparqlwrapper')
-
-# script
-if __name__ == '__main__':
-    main()
