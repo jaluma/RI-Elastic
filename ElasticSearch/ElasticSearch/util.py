@@ -3,6 +3,7 @@ import importlib
 import sys
 
 import SPARQLWrapper
+import json
 
 def install_and_import(package, module_name=""):
     if module_name == "":

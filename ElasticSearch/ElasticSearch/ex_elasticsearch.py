@@ -1,4 +1,5 @@
 from __future__ import print_function
+from util import serializer
 
 from elasticsearch import Elasticsearch
 
@@ -85,7 +86,7 @@ def ejercicio1():
     est = properties[0]
     properties_est = properties[1]
 
-    number = 1000
+    number = 25
 
     results = es.search(index="reddit-mentalhealth",
     body = {
@@ -144,7 +145,17 @@ def ejercicio1():
             }
         })
 
-    util.serializer(results['hits']['hits'], 'Ejercicio1.json')
+    json_data=[]
+    for element in results['hits']['hits']:
+        data = {}
+        element = element['_source']
+        data['selftext'] = element['selftext']
+        data['title'] = element['title']
+        data['subreddit'] = element['subreddit']
+        json_data.append(data)
+
+
+    util.serializer(json_data, 'Ejercicio1.json')
 
 def ejercicio2():
     es = config()
@@ -156,32 +167,30 @@ def ejercicio2():
     from elasticsearch_dsl import Search
     from elasticsearch_dsl.query import MoreLikeThis
 
-    s = Search()
-    s = s.query()
-
     number = 1000
 
-    s = Search(using=es, index="reddit-mentalhealth") \
-    .query(MoreLikeThis(like=query, fields=["selftext","title","subreddit"])) \
+    s = Search(using=es, index="reddit-mentalhealth")
+    s = s.query(MoreLikeThis(like={query}, fields=["selftext","title","subreddit"])) \
 
-    results = s.execute()
+    results = s.execute().to_dict()['hits']
+    print(results)
 
-    words = []
-    for j in ["Subreddit", "Text", "Title"]:
-        for i in results["aggregations"][j]["buckets"]:
-            if (i["key"] not in words):
-                words.append(i["key"])
+    #words = []
+    #for j in ["Subreddit", "Text", "Title"]:
+    #    for i in results["aggregations"][j]["buckets"]:
+    #        if (i["key"] not in words):
+    #            words.append(i["key"])
 
-    results = es.search(index="reddit-mentalhealth",
-        body = {
-            "query": {
-                "query_string": {
-                    "query": ' OR '.join(words),
-                }
-            }
-        })
+    #results = es.search(index="reddit-mentalhealth",
+    #    body = {
+    #        "query": {
+    #            "query_string": {
+    #                "query": ' OR '.join(words),
+    #            }
+    #        }
+    #    })
     
-    util.serializer(results['hits']['hits'], 'Ejercicio2.json')
+    util.serializer(results, 'Ejercicio2.json')
 
 
 def ejercicio3():
