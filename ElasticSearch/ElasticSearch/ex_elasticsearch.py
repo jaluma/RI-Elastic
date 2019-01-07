@@ -358,7 +358,7 @@ def ejercicio4():
 
 
 def select_estadistico():
-    ests = ['gnd', 'mutual_information', 'jlh', 'chi_square', 'porcentage']
+    ests = ['gnd', 'mutual_information', 'jlh', 'chi_square', 'percentage']
     while True:
         print("---Escoja estadistico---")
         print(" 1 -", ests[0])
