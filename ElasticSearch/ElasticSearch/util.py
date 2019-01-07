@@ -24,4 +24,4 @@ def install_and_import(package, module_name=""):
 def serializer(results, filename):
     with open(filename, 'w') as outfile:
         json.dump(results, outfile, sort_keys=True, indent=3)
-    print("Cargado correctamente los resultados.\n")
+    print("Cargados correctamente los resultados.\n")
